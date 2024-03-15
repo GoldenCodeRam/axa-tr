@@ -1,0 +1,22 @@
+# Load balancer
+upstream backend {
+    server laravel.test;
+}
+
+server {
+    # Upgrade upload size for images
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://backend;
+
+        # This ${NGINX_HOST_PORT} Environment Variable is needed for the testing
+        # of the site with the current development deployment.
+        # See more: https://bytexd.com/nginx-setup-run-laravel-in-a-reverse-proxy-preserve-url/
+        proxy_set_header Host $host:${NGINX_HOST_PORT};
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
